@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sewing Pattern Analyzer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink: #e91e8c;
+      --pink-dark: #c0166e;
+      --pink-light: #fce4f3;
+      --cream: #fdf6f0;
+      --text: #2d1b35;
+      --text-muted: #7a6a82;
+      --border: #e8d5f0;
+      --white: #ffffff;
+      --shadow: 0 4px 24px rgba(233,30,140,0.10);
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #e91e8c 0%, #9c27b0 100%);
+      color: white;
+      padding: 28px 24px 24px;
+      text-align: center;
+      box-shadow: 0 2px 20px rgba(233,30,140,0.3);
+    }
+
+    header h1 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 1rem;
+      opacity: 0.88;
+    }
+
+    .scissors-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 16px 60px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--pink);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2.5px dashed var(--border);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      background: var(--pink-light);
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--pink);
+      background: #fce4f3;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .upload-zone p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .upload-zone strong {
+      color: var(--pink);
+    }
+
+    /* Camera section */
+    .camera-section {
+      margin-top: 20px;
+    }
+
+    .camera-section h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    video {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 10px;
+      display: none;
+      margin: 16px auto 0;
+      border: 2px solid var(--border);
+    }
+
+    video.active { display: block; }
+
+    /* Preview */
+    #preview-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #preview-container img {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      display: block;
+      margin: 0 auto;
+      border: 2px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .preview-label {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), #9c27b0);
+      color: white;
+      box-shadow: 0 4px 14px rgba(233,30,140,0.35);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(233,30,140,0.45);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--pink);
+      border: 2px solid var(--pink);
+    }
+
+    .btn-secondary:hover {
+      background: var(--pink-light);
+    }
+
+    .btn-outline {
+      background: var(--white);
+      color: var(--text-muted);
+      border: 2px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+
+    .analyze-btn-wrap {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    /* Loading */
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--pink-light);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loading p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    #loading strong { color: var(--pink); }
+
+    /* Results */
+    #result-container {
+      display: none;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .result-header h2 {
+      margin-bottom: 0;
+    }
+
+    .pattern-content {
+      line-height: 1.75;
+      font-size: 0.97rem;
+    }
+
+    .pattern-content h1, .pattern-content h2, .pattern-content h3 {
+      color: var(--pink);
+      margin: 20px 0 8px;
+      font-weight: 700;
+    }
+
+    .pattern-content h1 { font-size: 1.3rem; }
+    .pattern-content h2 { font-size: 1.15rem; }
+    .pattern-content h3 { font-size: 1.05rem; }
+
+    .pattern-content ul, .pattern-content ol {
+      margin: 8px 0 8px 20px;
+    }
+
+    .pattern-content li { margin-bottom: 4px; }
+
+    .pattern-content p { margin: 8px 0; }
+
+    .pattern-content strong { color: var(--text); }
+
+    .pattern-content hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    /* Error */
+    .error-box {
+      background: #fff0f3;
+      border: 1px solid #ffb3c6;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #c0166e;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    /* Divider */
+    .or-divider {
+      text-align: center;
+      position: relative;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .or-divider::before, .or-divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .or-divider::before { left: 0; }
+    .or-divider::after { right: 0; }
+
+    canvas { display: none; }
+
+    @media (max-width: 600px) {
+      .card { padding: 20px 16px; }
+      .btn { padding: 11px 16px; font-size: 0.88rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="scissors-icon">✂️</span>
+  <h1>Sewing Pattern Analyzer</h1>
+  <p>Upload or photograph a garment — get a full sewing pattern instantly</p>
+</header>
+
+<main>
+
+  <!-- Upload / Camera card -->
+  <div class="card" id="input-card">
+    <h2>📸 Add Your Garment Photo</h2>
+
+    <!-- File Upload -->
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="file-input" accept="image/*" />
+      <span class="upload-icon">🖼️</span>
+      <p><strong>Click to upload</strong> or drag & drop</p>
+      <p style="margin-top:6px; font-size:0.82rem;">JPG, PNG, WebP supported</p>
+    </div>
+
+    <div class="or-divider">OR</div>
+
+    <!-- Camera -->
+    <div class="camera-section">
+      <h3>📷 Use Your Camera</h3>
+      <div class="camera-controls">
+        <button class="btn btn-secondary" id="start-camera-btn">📷 Open Camera</button>
+        <button class="btn btn-primary" id="capture-btn" style="display:none">📸 Capture Photo</button>
+        <button class="btn btn-outline" id="stop-camera-btn" style="display:none">✕ Close Camera</button>
+      </div>
+      <video id="camera-video" autoplay playsinline></video>
+      <canvas id="capture-canvas"></canvas>
+    </div>
+
+    <!-- Image Preview -->
+    <div id="preview-container">
+      <img id="preview-img" src="" alt="Selected garment" />
+      <p class="preview-label">Your garment photo is ready to analyze</p>
+    </div>
+
+    <div class="analyze-btn-wrap">
+      <button class="btn btn-primary" id="analyze-btn" disabled>
+        ✂️ Generate Sewing Pattern
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="card" id="loading">
+    <div class="spinner"></div>
+    <p><strong>Analyzing your garment...</strong></p>
+    <p style="margin-top:8px">Claude is examining the design, style, and construction details</p>
+  </div>
+
+  <!-- Results -->
+  <div class="card" id="result-container">
+    <div class="result-header">
+      <h2>🧵 Your Sewing Pattern</h2>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-outline" id="copy-btn">📋 Copy</button>
+        <button class="btn btn-secondary" id="new-analysis-btn">🔄 New Analysis</button>
+      </div>
+    </div>
+    <div class="pattern-content" id="pattern-output"></div>
+  </div>
+
+</main>
+
+<script>
+  let currentImageBase64 = null;
+  let mediaStream = null;
+
+  const fileInput = document.getElementById('file-input');
+  const uploadZone = document.getElementById('upload-zone');
+  const startCameraBtn = document.getElementById('start-camera-btn');
+  const captureBtn = document.getElementById('capture-btn');
+  const stopCameraBtn = document.getElementById('stop-camera-btn');
+  const cameraVideo = document.getElementById('camera-video');
+  const captureCanvas = document.getElementById('capture-canvas');
+  const previewContainer = document.getElementById('preview-container');
+  const previewImg = document.getElementById('preview-img');
+  const analyzeBtn = document.getElementById('analyze-btn');
+  const loading = document.getElementById('loading');
+  const resultContainer = document.getElementById('result-container');
+  const patternOutput = document.getElementById('pattern-output');
+  const copyBtn = document.getElementById('copy-btn');
+  const newAnalysisBtn = document.getElementById('new-analysis-btn');
+  const inputCard = document.getElementById('input-card');
+
+  // File upload
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) loadImageFile(file);
+  });
+
+  // Drag and drop
+  uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.classList.add('drag-over');
+  });
+
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+
+  uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadImageFile(file);
+  });
+
+  function loadImageFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPreview(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Camera
+  startCameraBtn.addEventListener('click', async () => {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      cameraVideo.srcObject = mediaStream;
+      cameraVideo.classList.add('active');
+      startCameraBtn.style.display = 'none';
+      captureBtn.style.display = 'inline-flex';
+      stopCameraBtn.style.display = 'inline-flex';
+    } catch (err) {
+      alert('Could not access camera: ' + err.message);
+    }
+  });
+
+  captureBtn.addEventListener('click', () => {
+    captureCanvas.width = cameraVideo.videoWidth;
+    captureCanvas.height = cameraVideo.videoHeight;
+    captureCanvas.getContext('2d').drawImage(cameraVideo, 0, 0);
+    const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.92);
+    setPreview(dataUrl);
+    stopCamera();
+  });
+
+  stopCameraBtn.addEventListener('click', stopCamera);
+
+  function stopCamera() {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(t => t.stop());
+      mediaStream = null;
+    }
+    cameraVideo.classList.remove('active');
+    startCameraBtn.style.display = 'inline-flex';
+    captureBtn.style.display = 'none';
+    stopCameraBtn.style.display = 'none';
+  }
+
+  function setPreview(dataUrl) {
+    currentImageBase64 = dataUrl;
+    previewImg.src = dataUrl;
+    previewContainer.style.display = 'block';
+    analyzeBtn.disabled = false;
+  }
+
+  // Analyze
+  analyzeBtn.addEventListener('click', async () => {
+    if (!currentImageBase64) return;
+
+    inputCard.style.display = 'none';
+    loading.style.display = 'block';
+    resultContainer.style.display = 'none';
+
+    try {
+      const response = await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: currentImageBase64 }),
+      });
+
+      const data = await response.json();
+      loading.style.display = 'none';
+
+      if (data.error) {
+        inputCard.style.display = 'block';
+        showError(data.error);
+        return;
+      }
+
+      patternOutput.innerHTML = markdownToHtml(data.pattern);
+      resultContainer.style.display = 'block';
+      resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+      loading.style.display = 'none';
+      inputCard.style.display = 'block';
+      showError('Network error: ' + err.message);
+    }
+  });
+
+  // Copy
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(patternOutput.innerText).then(() => {
+      copyBtn.textContent = '✅ Copied!';
+      setTimeout(() => copyBtn.textContent = '📋 Copy', 2000);
+    });
+  });
+
+  // New analysis
+  newAnalysisBtn.addEventListener('click', () => {
+    currentImageBase64 = null;
+    previewImg.src = '';
+    previewContainer.style.display = 'none';
+    analyzeBtn.disabled = true;
+    fileInput.value = '';
+    resultContainer.style.display = 'none';
+    inputCard.style.display = 'block';
+    inputCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  function showError(msg) {
+    const existing = document.querySelector('.error-box');
+    if (existing) existing.remove();
+    const box = document.createElement('div');
+    box.className = 'error-box';
+    box.innerHTML = `<span>⚠️</span><span>${msg}</span>`;
+    inputCard.querySelector('.analyze-btn-wrap').before(box);
+  }
+
+  // Simple markdown-to-HTML converter
+  function markdownToHtml(md) {
+    return md
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^---$/gm, '<hr>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+      .replace(/^(?!<[hlu]|<ol|<hr|<li)(.+)$/gm, '<p>$1</p>')
+      .replace(/<\/ul>\s*<ul>/g, '')
+      .replace(/\n{2,}/g, '\n');
+  }
+</script>
+</body>
+</html>
