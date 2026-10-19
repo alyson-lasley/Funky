@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kandi Pattern Studio</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0c0618;--s1:#16102a;--s2:#201640;--s3:#2c1f55;--ac:#ff1493;--ac2:#ff69b4;--ac3:#da00ff;--ok:#39ff14;--tx:#f0e6ff;--tx2:#a090b8;--ln:rgba(255,20,147,.25)}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--ac);border-radius:9px}
+button,input,select{font-family:inherit;color:inherit}
+.hdr{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 16px;background:linear-gradient(135deg,var(--ac),var(--ac3));box-shadow:0 2px 12px rgba(218,0,255,.35)}
+.hdr h1{font-size:18px;font-weight:700;letter-spacing:.5px}
+.hdr small{font-size:11px;opacity:.85;display:block}
+.tabs{display:flex;gap:4px;margin-left:auto}
+.tab{padding:7px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(0,0,0,.15);font-weight:700;font-size:13px;cursor:pointer}
+.tab.on{background:#fff;color:var(--ac)}
+main{max-width:1200px;margin:0 auto;padding:16px}
+.view{display:none}.view.on{display:block}
+h2{font-size:16px;margin:18px 0 10px;color:var(--ac2)}
+h2:first-child{margin-top:0}
+.note{font-size:13px;color:var(--tx2);line-height:1.5}
+.note a{color:var(--ac2)}
+.banner{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:14px;border:1px solid var(--ln);border-radius:12px;background:var(--s1);margin-bottom:6px}
+.btn{padding:8px 14px;border-radius:8px;border:1px solid var(--ln);background:var(--s2);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+a.btn{color:var(--tx)}
+.btn:hover{border-color:var(--ac);background:var(--s3)}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+.btn.pri:hover{background:var(--ac2)}
+.btn.sm{padding:5px 9px;font-size:12px}
+.btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.card{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:10px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .12s,border-color .12s}
+.card:hover{transform:translateY(-2px);border-color:var(--ac)}
+.card .th{background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;height:120px;overflow:hidden}
+.card .th canvas{max-width:100%;max-height:110px}
+.card b{font-size:13px}
+.card span{font-size:11px;color:var(--tx2)}
+.card .acts{display:flex;gap:4px;flex-wrap:wrap}
+.empty{padding:20px;border:1px dashed var(--ln);border-radius:12px;color:var(--tx2);font-size:13px;text-align:center}
+.ed{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.ed{grid-template-columns:1fr}}
+.panel{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.panel label{font-size:12px;color:var(--tx2);display:flex;flex-direction:column;gap:4px}
+.panel input[type=text],.panel input[type=number],.panel select{background:var(--bg);border:1px solid var(--ln);border-radius:6px;padding:7px;font-size:13px;width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
+.row>label{flex:1;min-width:70px}
+.sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ac2)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(28px,1fr));gap:5px}
+.sw{aspect-ratio:1;border-radius:7px;border:2px solid transparent;cursor:pointer;position:relative;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
+.sw.on{border-color:#fff;box-shadow:0 0 0 2px var(--ac)}
+.cur{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:6px}
+.cur i{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid rgba(255,255,255,.3)}
+.stage{background:var(--s1);border:1px solid var(--ln);border-radius:12px;padding:12px;overflow:auto;min-height:300px;display:flex;align-items:flex-start;justify-content:center}
+.stage canvas{touch-action:none;cursor:crosshair;display:block}
+.counts{display:flex;flex-direction:column;gap:4px;font-size:12px}
+.counts div{display:flex;align-items:center;gap:6px}
+.counts i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.counts em{margin-left:auto;font-style:normal;font-weight:700}
+.chk{flex-direction:row!important;align-items:center;gap:6px!important;cursor:pointer}
+.work{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+@media(max-width:820px){.work{grid-template-columns:1fr}}
+.seq{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--ln);font-size:13px;font-weight:700}
+.chip i{width:16px;height:16px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.35)}
+.big{font-size:22px;font-weight:700}
+.bar{height:8px;border-radius:9px;background:var(--bg);overflow:hidden}
+.bar div{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac3));transition:width .2s}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.on{display:flex}
+.modal .panel{width:min(560px,100%);max-height:92vh;overflow:auto}
+.prev{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;background:var(--bg);border-radius:8px;padding:10px}
+.prev canvas{max-width:240px;max-height:240px;image-rendering:pixelated}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ac);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div><h1>✨ Kandi Pattern Studio</h1><small>Design, import &amp; bead pony-bead patterns · PLUR</small></div>
+  <nav class="tabs">
+    <button class="tab on" data-v="lib">Library</button>
+    <button class="tab" data-v="ed">Editor</button>
+    <button class="tab" data-v="work">Bead It</button>
+  </nav>
+</header>
+
+<main>
+  <!-- LIBRARY -->
+  <section class="view on" id="v-lib">
+    <div class="banner">
+      <div class="note" style="max-width:640px">
+        <b style="color:var(--tx)">Find more patterns on <a href="https://kandipatterns.com" target="_blank" rel="noopener">kandipatterns.com</a>.</b>
+        Screenshot a pattern you like, then use <b>Import image</b>: the app turns it into an editable bead grid with color counts and row-by-row instructions.
+      </div>
+      <div class="row">
+        <a class="btn" href="https://kandipatterns.com" target="_blank" rel="noopener">🌐 Browse kandipatterns.com</a>
+        <button class="btn pri" id="btnImport">📷 Import image</button>
+        <button class="btn" id="btnNew">＋ New blank</button>
+        <button class="btn" id="btnLoadJson">📂 Open .json</button>
+      </div>
+    </div>
+    <h2>My patterns</h2>
+    <div class="grid" id="mine"></div>
+    <h2>Starter patterns</h2>
+    <div class="grid" id="starters"></div>
+  </section>
+
+  <!-- EDITOR -->
+  <section class="view" id="v-ed">
+    <div class="ed">
+      <div class="panel">
+        <label>Name<input type="text" id="pName"></label>
+        <div class="row">
+          <label>Columns<input type="number" id="pW" min="2" max="80"></label>
+          <label>Rows<input type="number" id="pH" min="2" max="120"></label>
+        </div>
+        <label>Stitch
+          <select id="pStitch">
+            <option value="square">Square / ladder (straight grid)</option>
+            <option value="peyote">Peyote (offset rows)</option>
+          </select>
+        </label>
+        <div class="sec">Tools</div>
+        <div class="row" id="tools">
+          <button class="btn sm on" data-t="paint">✏️ Paint</button>
+          <button class="btn sm" data-t="fill">🪣 Fill</button>
+          <button class="btn sm" data-t="erase">🧽 Erase</button>
+          <button class="btn sm" data-t="pick">💧 Pick</button>
+        </div>
+        <div class="row">
+          <button class="btn sm" id="undo">↶ Undo</button>
+          <button class="btn sm" id="redo">↷ Redo</button>
+          <button class="btn sm" id="flipH">⇋ Mirror</button>
+          <button class="btn sm" id="flipV">⇵ Flip</button>
+          <button class="btn sm" id="clear">🗑 Clear</button>
+        </div>
+        <div class="sec">Pony bead colors</div>
+        <div class="cur">Current: <i id="curSw"></i><span id="curName"></span></div>
+        <div class="pal" id="pal"></div>
+        <div class="sec">Bead count</div>
+        <div class="counts" id="counts"></div>
+        <div class="row">
+          <button class="btn pri" id="save">💾 Save</button>
+          <button class="btn" id="toWork">🧵 Bead it</button>
+        </div>
+        <div class="row">
+          <button class="btn sm" id="expPng">⬇ PNG</button>
+          <button class="btn sm" id="expJson">⬇ .json</button>
+          <button class="btn sm" id="dup">⧉ Duplicate</button>
+        </div>
+      </div>
+      <div class="stage"><canvas id="cv"></canvas></div>
+    </div>
+  </section>
+
+  <!-- WORK MODE -->
+  <section class="view" id="v-work">
+    <div class="work">
+      <div class="stage"><canvas id="wcv"></canvas></div>
+      <div class="panel">
+        <div><div class="sec" id="wName"></div><div class="big" id="wRow"></div><div class="note" id="wDir"></div></div>
+        <div class="bar"><div id="wBar"></div></div>
+        <div class="sec">String these beads</div>
+        <div class="seq" id="wSeq"></div>
+        <div class="row">
+          <button class="btn" id="wPrev">◀ Prev</button>
+          <button class="btn pri" id="wNext" style="flex:1;justify-content:center">Done, next row ▶</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="wSnake"> Snake (switch direction every row)</label>
+        <button class="btn sm" id="wReset">↺ Start over</button>
+        <div class="note">Tip: tap a row in the pattern to jump to it. Arrow keys work too.</div>
+        <div class="sec">Beads needed</div>
+        <div class="counts" id="wCounts"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- IMPORT MODAL -->
+<div class="modal" id="imp">
+  <div class="panel">
+    <div class="sec">Import a pattern image</div>
+    <div class="note">Pick a screenshot or photo of a pattern. Crop it to the bead grid first for the best result, then set the number of bead columns and rows it shows.</div>
+    <input type="file" id="impFile" accept="image/*">
+    <div class="row">
+      <label>Columns<input type="number" id="impW" value="20" min="2" max="80"></label>
+      <label>Rows<input type="number" id="impH" value="20" min="2" max="120"></label>
+      <button class="btn sm" id="impAuto" title="Match the image's aspect ratio">Fit rows</button>
+    </div>
+    <div class="row">
+      <label>Stitch<select id="impStitch"><option value="square">Square</option><option value="peyote">Peyote</option></select></label>
+      <label>Max colors<input type="number" id="impMax" value="8" min="2" max="20"></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="impBg" checked> Treat white / transparent background as empty</label>
+    <div class="prev"><canvas id="impSrc"></canvas><canvas id="impOut"></canvas></div>
+    <div class="row">
+      <button class="btn" id="impCancel">Cancel</button>
+      <button class="btn pri" id="impGo" disabled>Create pattern</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="jsonFile" accept=".json,application/json" hidden>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- palette ----------
+const BEADS=[
+  ['Black','#1c1c1f','K'],['White','#f4f4f4','W'],['Gray','#9a9aa5','A'],['Red','#e3242b','R'],
+  ['Orange','#ff8c1a','O'],['Yellow','#ffe135','Y'],['Lime','#9cff2e','L'],['Green','#1fa84f','G'],
+  ['Teal','#14b8a6','T'],['Light Blue','#7fd3ff','C'],['Blue','#2463eb','B'],['Purple','#8b3fd9','P'],
+  ['Lavender','#c9a7ff','V'],['Pink','#ffa6d2','N'],['Hot Pink','#ff1f8f','H'],['Brown','#7a4a24','M'],
+  ['Tan','#d9b38c','S'],['Neon Green','#39ff14','E'],['Neon Orange','#ff5f1f','F'],['Glow White','#e9ffd6','Z']
+];
+const CH={};BEADS.forEach((b,i)=>CH[b[2]]=i);
+const RGB=BEADS.map(b=>[1,3,5].map(i=>parseInt(b[1].substr(i,2),16)));
+
+// ---------- starter patterns (original designs) ----------
+function art(name,stitch,rows){
+  const w=Math.max(...rows.map(r=>r.length));
+  const cells=[];rows.forEach(r=>{for(let x=0;x<w;x++){const c=r[x];cells.push(c&&c!=='.'?CH[c]:-1)}});
+  return{name,stitch,w,h:rows.length,cells};
+}
+function gen(name,stitch,w,h,f){const cells=[];for(let y=0;y<h;y++)for(let x=0;x<w;x++)cells.push(f(x,y));return{name,stitch,w,h,cells}}
+const c=k=>CH[k];
+const STARTERS=[
+  art('Candy Heart','square',['..HH...HH..','.HNNH.HNNH.','HNWNNHNNNNH','HNNNNNNNNNH','HNNNNNNNNNH','.HNNNNNNNH.','..HNNNNNH..','...HNNNH...','....HNH....','.....H.....']),
+  art('Happy Face','square',['...YYYYY...','..YYYYYYY..','.YYKYYYKYY.','YYYKYYYKYYY','YYYYYYYYYYY','YYYYYYYYYYY','YKYYYYYYYKY','YYKYYYYYKYY','.YYKKKKKYY.','..YYYYYYY..','...YYYYY...']),
+  gen('Rainbow Diagonal','peyote',12,14,(x,y)=>[c('R'),c('O'),c('Y'),c('L'),c('B'),c('P')][(x+y)%6]),
+  gen('Rave Checker','square',12,12,(x,y)=>((x>>1)+(y>>1))%2?c('K'):c('H')),
+  art('Lucky Star','square',['.....Y.....','....YYY....','....YYY....','YYYYYYYYYYY','.YYYYYYYYY.','..YYYYYYY..','...YYYYY...','..YYYYYYY..','..YYY.YYY..','.YYY...YYY.','.YY.....YY.']),
+  art('Toadstool','square',['...RRRRR...','..RWWRRRR..','.RRWWRRWWR.','.RRRRRRWWR.','RRWWRRRRRRR','RRWWRRRWWRR','...WWWWW...','...WKWKW...','...WWWWW...','....WWW....']),
+  art('Blip the Alien','square',['....L.L....','....L.L....','...LLLLL...','..LLLLLLL..','.LLKKLKKLL.','.LLKWLKWLL.','.LLLLLLLLL.','..LLKKKLL..','...LLLLL...','..LL...LL..']),
+  gen('Neon Zigzag','peyote',16,12,(x,y)=>[c('H'),c('P'),c('C'),c('W')][Math.floor((y+Math.abs((x%8)-4))/2)%4]),
+  art('Daisy','square',['....NNN....','...NNNNN...','.NNNNNNNNN.','NNNNYYYNNNN','NNNYYYYYNNN','.NNNYYYNNN.','...NNNNN...','.....G.....','..GG.G.....','...GGG.....','.....G.....']),
+  art('Berry Sweet','square',['...GGG...','.GGGGGGG.','.RRRGRRR.','RRYRRRYRR','RRRRYRRRR','RYRRRRRYR','.RRRYRRR.','.RRRRRRR.','..RYRRR..','...RRR...']),
+  gen('Galaxy Fade','peyote',14,16,(x,y)=>{const r=Math.abs(Math.sin(x*12.9898+y*78.233)*43758.5453)%1;if(r<.07)return c('W');return[c('K'),c('K'),c('P'),c('P'),c('B'),c('C')][Math.min(5,Math.floor((y+r*3)/3))]}),
+  gen('Sunset Stripes','peyote',10,12,(x,y)=>[c('Y'),c('O'),c('F'),c('H'),c('P'),c('B')][Math.floor(y/2)])
+];
+STARTERS.forEach((p,i)=>p.id='starter-'+i);
+
+// ---------- storage ----------
+const KEY='kandi.patterns.v1',PKEY='kandi.progress.v1';
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Could not save in this browser; export .json instead')}}
+let mine=load(KEY,[]);
+let progress=load(PKEY,{});
+
+// ---------- helpers ----------
+const $=id=>document.getElementById(id);
+const clone=p=>JSON.parse(JSON.stringify(p));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),1800)}
+function countBeads(p){const n={};p.cells.forEach(v=>{if(v>=0)n[v]=(n[v]||0)+1});return Object.entries(n).map(([k,v])=>[+k,v]).sort((a,b)=>b[1]-a[1])}
+function renderCounts(el,p){
+  const cs=countBeads(p),tot=cs.reduce((s,x)=>s+x[1],0);
+  el.innerHTML=cs.map(([i,n])=>`<div><i style="background:${BEADS[i][1]}"></i>${BEADS[i][0]}<em>${n}</em></div>`).join('')+
+    `<div style="border-top:1px solid var(--ln);padding-top:4px"><b>Total</b><em>${tot}</em></div>`;
+}
+
+// draw a pattern on a canvas; bs = bead size in css px
+function draw(cv,p,bs,opt={}){
+  const off=p.stitch==='peyote'?bs/2:0,dpr=window.devicePixelRatio||1;
+  const W=p.w*bs+off,H=p.h*bs;
+  cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';
+  const g=cv.getContext('2d');g.setTransform(dpr,0,0,dpr,0,0);g.clearRect(0,0,W,H);
+  for(let y=0;y<p.h;y++){
+    const dim=opt.row!=null&&y!==opt.row,done=opt.row!=null&&y<opt.row;
+    for(let x=0;x<p.w;x++){
+      const v=p.cells[y*p.w+x],px=x*bs+(y%2?off:0),py=y*bs;
+      g.globalAlpha=dim?(done?.35:.6):1;
+      bead(g,px,py,bs,v,opt.grid!==false);
+    }
+  }
+  g.globalAlpha=1;
+  if(opt.row!=null){g.strokeStyle='#fff';g.lineWidth=2;g.strokeRect((opt.row%2?off:0)+1,opt.row*bs+1,p.w*bs-2,bs-2)}
+}
+function bead(g,x,y,s,v,grid){
+  const p=Math.max(.5,s*.06),r=s*.28;
+  if(v<0){if(grid){g.strokeStyle='rgba(255,105,180,.18)';g.lineWidth=1;rr(g,x+p,y+p,s-2*p,s-2*p,r);g.stroke()}return}
+  const col=BEADS[v][1];
+  g.fillStyle=col;rr(g,x+p,y+p,s-2*p,s-2*p,r);g.fill();
+  if(s>=8){
+    const gr=g.createLinearGradient(x,y,x,y+s);gr.addColorStop(0,'rgba(255,255,255,.35)');gr.addColorStop(.5,'rgba(255,255,255,0)');gr.addColorStop(1,'rgba(0,0,0,.25)');
+    g.fillStyle=gr;rr(g,x+p,y+p,s-2*p,s-2*p,r);g.fill();
+    g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(x+s/2,y+s/2,s*.09,s*.16,0,0,7);g.fill();
+  }
+}
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+
+// ---------- views ----------
+function show(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
+  if(v==='lib')renderLib();if(v==='ed')renderEd();if(v==='work')renderWork();}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
+
+// ---------- library ----------
+function card(p,own){
+  const d=document.createElement('div');d.className='card';
+  const th=document.createElement('div');th.className='th';const cv=document.createElement('canvas');th.appendChild(cv);
+  draw(cv,p,Math.max(3,Math.min(10,Math.floor(140/Math.max(p.w+.5,p.h)))),{grid:false});
+  const tot=p.cells.filter(v=>v>=0).length;
+  d.append(th);d.insertAdjacentHTML('beforeend',`<b>${esc(p.name)}</b><span>${p.w}×${p.h} · ${p.stitch} · ${tot} beads</span>`);
+  const a=document.createElement('div');a.className='acts';
+  const b1=mk('Edit',()=>openEd(p,own)),b2=mk('Bead it',()=>{openEd(p,own);show('work')});a.append(b1,b2);
+  if(own)a.append(mk('Delete',()=>{if(confirm('Delete "'+p.name+'"?')){mine=mine.filter(q=>q.id!==p.id);store(KEY,mine);renderLib()}}));
+  d.append(a);d.onclick=e=>{if(e.target.tagName!=='BUTTON')openEd(p,own)};
+  return d;
+}
+function mk(t,f){const b=document.createElement('button');b.className='btn sm';b.textContent=t;b.onclick=e=>{e.stopPropagation();f()};return b}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function renderLib(){
+  const m=$('mine');m.innerHTML='';
+  if(!mine.length)m.innerHTML='<div class="empty">No saved patterns yet. Edit a starter, import an image, or start blank.</div>';
+  mine.slice().reverse().forEach(p=>m.append(card(p,true)));
+  const s=$('starters');s.innerHTML='';STARTERS.forEach(p=>s.append(card(p,false)));
+}
+
+// ---------- editor ----------
+let cur=null,isOwn=false,tool='paint',color=CH.H,hist=[],fut=[],bs=20;
+function openEd(p,own){cur=clone(p);isOwn=own;if(!own){cur.id='p'+Date.now();cur.name=p.name+(p.id.startsWith('starter')?'':' copy')}hist=[];fut=[];show('ed')}
+function newBlank(w=15,h=15,stitch='square'){cur={id:'p'+Date.now(),name:'My Kandi',stitch,w,h,cells:Array(w*h).fill(-1)};isOwn=false;hist=[];fut=[];show('ed')}
+$('btnNew').onclick=()=>newBlank();
+
+const pal=$('pal');
+BEADS.forEach((b,i)=>{const s=document.createElement('div');s.className='sw';s.style.background=b[1];s.title=b[0];s.onclick=()=>setColor(i);pal.append(s)});
+function setColor(i){color=i;[...pal.children].forEach((s,j)=>s.classList.toggle('on',j===i));$('curSw').style.background=BEADS[i][1];$('curName').textContent=BEADS[i][0];if(tool==='erase'||tool==='pick')setTool('paint')}
+function setTool(t){tool=t;document.querySelectorAll('#tools .btn').forEach(b=>b.classList.toggle('on',b.dataset.t===t))}
+document.querySelectorAll('#tools .btn').forEach(b=>b.onclick=()=>setTool(b.dataset.t));
+setColor(color);
+
+function fitBs(p,box){const avail=Math.max(200,box.clientWidth-24);return Math.max(8,Math.min(34,Math.floor(avail/(p.w+(p.stitch==='peyote'?.5:0)))))}
+function renderEd(){
+  if(!cur){newBlank();return}
+  $('pName').value=cur.name;$('pW').value=cur.w;$('pH').value=cur.h;$('pStitch').value=cur.stitch;
+  bs=fitBs(cur,$('cv').parentElement);redraw();
+}
+function redraw(){draw($('cv'),cur,bs);renderCounts($('counts'),cur);$('undo').disabled=!hist.length;$('redo').disabled=!fut.length}
+function snap(){hist.push(cur.cells.slice());if(hist.length>100)hist.shift();fut=[]}
+$('undo').onclick=()=>{if(!hist.length)return;fut.push(cur.cells.slice());cur.cells=hist.pop();redraw()};
+$('redo').onclick=()=>{if(!fut.length)return;hist.push(cur.cells.slice());cur.cells=fut.pop();redraw()};
+$('clear').onclick=()=>{snap();cur.cells.fill(-1);redraw()};
+$('flipH').onclick=()=>{snap();const n=[];for(let y=0;y<cur.h;y++)for(let x=0;x<cur.w;x++)n.push(cur.cells[y*cur.w+cur.w-1-x]);cur.cells=n;redraw()};
+$('flipV').onclick=()=>{snap();const n=[];for(let y=0;y<cur.h;y++)for(let x=0;x<cur.w;x++)n.push(cur.cells[(cur.h-1-y)*cur.w+x]);cur.cells=n;redraw()};
+$('pName').oninput=e=>cur.name=e.target.value||'Untitled';
+$('pStitch').onchange=e=>{cur.stitch=e.target.value;renderEd()};
+function resize(){
+  const w=Math.max(2,Math.min(80,+$('pW').value||cur.w)),h=Math.max(2,Math.min(120,+$('pH').value||cur.h));
+  if(w===cur.w&&h===cur.h)return;snap();
+  const n=[];for(let y=0;y<h;y++)for(let x=0;x<w;x++)n.push(x<cur.w&&y<cur.h?cur.cells[y*cur.w+x]:-1);
+  cur.w=w;cur.h=h;cur.cells=n;hist=[];renderEd();
+}
+$('pW').onchange=resize;$('pH').onchange=resize;
+
+function hit(cv,p,size,e){
+  const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top,y=Math.floor(py/size);
+  if(y<0||y>=p.h)return null;const off=p.stitch==='peyote'&&y%2?size/2:0,x=Math.floor((px-off)/size);
+  return x<0||x>=p.w?null:{x,y};
+}
+function apply(pt){
+  const i=pt.y*cur.w+pt.x;
+  if(tool==='pick'){if(cur.cells[i]>=0)setColor(cur.cells[i]);return false}
+  if(tool==='fill'){flood(pt.x,pt.y,color);return true}
+  const v=tool==='erase'?-1:color;if(cur.cells[i]===v)return false;cur.cells[i]=v;return true;
+}
+function flood(x,y,v){
+  const t=cur.cells[y*cur.w+x];if(t===v)return;const st=[[x,y]];
+  while(st.length){const[a,b]=st.pop();if(a<0||b<0||a>=cur.w||b>=cur.h||cur.cells[b*cur.w+a]!==t)continue;cur.cells[b*cur.w+a]=v;st.push([a+1,b],[a-1,b],[a,b+1],[a,b-1])}
+}
+let drag=false;const cv=$('cv');
+cv.addEventListener('pointerdown',e=>{const pt=hit(cv,cur,bs,e);if(!pt)return;snap();drag=tool==='paint'||tool==='erase';cv.setPointerCapture(e.pointerId);if(!apply(pt)&&!drag)hist.pop();redraw()});
+cv.addEventListener('pointermove',e=>{if(!drag)return;const pt=hit(cv,cur,bs,e);if(pt&&apply(pt))redraw()});
+cv.addEventListener('pointerup',()=>drag=false);cv.addEventListener('pointercancel',()=>drag=false);
+
+function savePattern(){
+  cur.name=$('pName').value||'Untitled';
+  const i=mine.findIndex(p=>p.id===cur.id);if(i>=0)mine[i]=clone(cur);else mine.push(clone(cur));
+  isOwn=true;store(KEY,mine);toast('Saved "'+cur.name+'"');
+}
+$('save').onclick=savePattern;
+$('dup').onclick=()=>{cur=clone(cur);cur.id='p'+Date.now();cur.name+=' copy';isOwn=false;renderEd();toast('Duplicated: save to keep it')};
+$('toWork').onclick=()=>show('work');
+$('expPng').onclick=()=>{const t=document.createElement('canvas');draw(t,cur,24);dl(t.toDataURL('image/png'),fname(cur)+'.png')};
+$('expJson').onclick=()=>dl(URL.createObjectURL(new Blob([JSON.stringify(cur)],{type:'application/json'})),fname(cur)+'.json');
+function fname(p){return(p.name||'kandi').replace(/[^\w-]+/g,'_')}
+function dl(href,name){const a=document.createElement('a');a.href=href;a.download=name;document.body.append(a);a.click();a.remove()}
+$('btnLoadJson').onclick=()=>$('jsonFile').click();
+$('jsonFile').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{
+  try{const p=JSON.parse(t);if(!(p.w>0&&p.h>0&&Array.isArray(p.cells)&&p.cells.length===p.w*p.h))throw 0;
+    p.cells=p.cells.map(v=>Number.isInteger(v)&&v>=0&&v<BEADS.length?v:-1);p.stitch=p.stitch==='peyote'?'peyote':'square';p.name=String(p.name||f.name);p.id='p'+Date.now();
+    openEd(p,false);toast('Opened, press Save to keep it')}catch(err){toast('That file is not a Kandi pattern')}});e.target.value=''};
+
+// ---------- work mode ----------
+function renderWork(){
+  if(!cur){show('lib');toast('Pick a pattern first');return}
+  const pr=progress[cur.id]||{row:0,snake:false};pr.row=Math.min(pr.row,cur.h);progress[cur.id]=pr;
+  $('wSnake').checked=pr.snake;
+  const wcv=$('wcv'),size=fitBs(cur,wcv.parentElement);wcv._bs=size;
+  draw(wcv,cur,size,{row:Math.min(pr.row,cur.h-1)});
+  $('wName').textContent=cur.name;$('wBar').style.width=(pr.row/cur.h*100)+'%';
+  if(pr.row>=cur.h){$('wRow').textContent='🎉 All done!';$('wDir').textContent='Tie it off and trade it with some PLUR.';$('wSeq').innerHTML='';$('wNext').disabled=true}
+  else{
+    const rev=pr.snake&&pr.row%2===1,row=cur.cells.slice(pr.row*cur.w,(pr.row+1)*cur.w);if(rev)row.reverse();
+    const runs=[];row.forEach(v=>{const l=runs[runs.length-1];if(l&&l[0]===v)l[1]++;else runs.push([v,1])});
+    $('wRow').textContent=`Row ${pr.row+1} of ${cur.h}`;$('wDir').textContent=(rev?'Right → left':'Left → right')+(cur.stitch==='peyote'?' · peyote: this row sits offset from the last':'');
+    $('wSeq').innerHTML=runs.map(([v,n])=>v<0?`<span class="chip">${n}× skip</span>`:`<span class="chip"><i style="background:${BEADS[v][1]}"></i>${n}× ${BEADS[v][0]}</span>`).join('');
+    $('wNext').disabled=false;
+  }
+  $('wPrev').disabled=pr.row===0;renderCounts($('wCounts'),cur);store(PKEY,progress);
+}
+function step(d){const pr=progress[cur.id];pr.row=Math.max(0,Math.min(cur.h,pr.row+d));renderWork()}
+$('wNext').onclick=()=>step(1);$('wPrev').onclick=()=>step(-1);
+$('wReset').onclick=()=>{progress[cur.id].row=0;renderWork()};
+$('wSnake').onchange=e=>{progress[cur.id].snake=e.target.checked;renderWork()};
+$('wcv').addEventListener('click',e=>{const pt=hit($('wcv'),cur,$('wcv')._bs,e);if(pt){progress[cur.id].row=pt.y;renderWork()}});
+document.addEventListener('keydown',e=>{
+  if(!$('v-work').classList.contains('on')||e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowDown'||e.key==='ArrowRight'||e.key===' '){e.preventDefault();step(1)}
+  if(e.key==='ArrowUp'||e.key==='ArrowLeft'){e.preventDefault();step(-1)}
+});
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if($('v-ed').classList.contains('on'))renderEd();if($('v-work').classList.contains('on'))renderWork()},150)});
+
+// ---------- image import ----------
+let impImg=null;
+$('btnImport').onclick=()=>{$('imp').classList.add('on')};
+$('impCancel').onclick=()=>$('imp').classList.remove('on');
+$('impFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{impImg=im;$('impGo').disabled=false;fitRows();impPreview()};im.src=URL.createObjectURL(f)};
+function fitRows(){if(impImg)$('impH').value=Math.max(2,Math.min(120,Math.round(+$('impW').value*impImg.height/impImg.width)))}
+$('impAuto').onclick=()=>{fitRows();impPreview()};
+['impW','impH','impStitch','impMax','impBg'].forEach(id=>$(id).addEventListener('change',impPreview));
+function nearest(r,g,b){let bi=0,bd=1e9;RGB.forEach((c,i)=>{const dr=r-c[0],dg=g-c[1],db=b-c[2],d=2*dr*dr+4*dg*dg+3*db*db;if(d<bd){bd=d;bi=i}});return bi}
+function impBuild(){
+  const w=Math.max(2,Math.min(80,+$('impW').value)),h=Math.max(2,Math.min(120,+$('impH').value));
+  // sample the centre of each cell (avoids grid lines between beads) by averaging a small inner patch
+  const sc=document.createElement('canvas'),S=8;sc.width=w*S;sc.height=h*S;const g=sc.getContext('2d',{willReadFrequently:true});
+  g.imageSmoothingQuality='high';g.drawImage(impImg,0,0,w*S,h*S);const d=g.getImageData(0,0,w*S,h*S).data;
+  let cells=[];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    let r=0,gg=0,b=0,a=0,n=0;
+    for(let yy=2;yy<S-2;yy++)for(let xx=2;xx<S-2;xx++){const i=((y*S+yy)*w*S+x*S+xx)*4;r+=d[i];gg+=d[i+1];b+=d[i+2];a+=d[i+3];n++}
+    r/=n;gg/=n;b/=n;a/=n;
+    if($('impBg').checked&&(a<128||(r>235&&gg>235&&b>235)))cells.push(-1);else cells.push(nearest(r,gg,b));
+  }
+  // limit the number of colors: remap rare colors to the closest kept one
+  const max=Math.max(2,+$('impMax').value),cnt={};cells.forEach(v=>{if(v>=0)cnt[v]=(cnt[v]||0)+1});
+  const keep=Object.keys(cnt).map(Number).sort((a,b)=>cnt[b]-cnt[a]).slice(0,max);
+  cells=cells.map(v=>{if(v<0||keep.includes(v))return v;const[c0,c1,c2]=RGB[v];let bi=keep[0],bd=1e9;keep.forEach(k=>{const c=RGB[k],dd=(c0-c[0])**2+(c1-c[1])**2+(c2-c[2])**2;if(dd<bd){bd=dd;bi=k}});return bi});
+  return{id:'p'+Date.now(),name:'Imported pattern',stitch:$('impStitch').value,w,h,cells};
+}
+function impPreview(){
+  if(!impImg)return;const s=$('impSrc'),k=Math.min(1,240/Math.max(impImg.width,impImg.height));
+  s.width=impImg.width*k;s.height=impImg.height*k;s.getContext('2d').drawImage(impImg,0,0,s.width,s.height);
+  const p=impBuild();draw($('impOut'),p,Math.max(3,Math.floor(240/Math.max(p.w+.5,p.h))),{grid:false});
+}
+$('impGo').onclick=()=>{if(!impImg)return;const p=impBuild();$('imp').classList.remove('on');openEd(p,false);toast('Imported: tidy it up, then Save')};
+
+renderLib();
+</script>
+</body>
+</html>
