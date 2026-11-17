@@ -97,6 +97,8 @@ a.btn{color:var(--tx)}
 .guide p,.guide li{font-size:14px;line-height:1.6;color:var(--tx)}
 .guide ul,.guide ol{padding-left:22px;display:flex;flex-direction:column;gap:4px}
 .cchip{width:30px;height:30px;border-radius:8px;border:2px solid rgba(255,255,255,.4);cursor:pointer}
+.cur i.empty{background:repeating-linear-gradient(45deg,#fff 0 3px,#bbb 3px 6px)}
+#fzCv{cursor:pointer}
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ac);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:60}
 .toast.on{opacity:1}
 </style>
@@ -110,6 +112,7 @@ a.btn{color:var(--tx)}
     <button class="tab" data-v="links">Saved Links</button>
     <button class="tab" data-v="ed">Editor</button>
     <button class="tab" data-v="work">Bead It</button>
+    <button class="tab" data-v="fuse">Fuse</button>
     <button class="tab" data-v="guide">Guide</button>
   </nav>
 </header>
@@ -223,6 +226,68 @@ a.btn{color:var(--tx)}
     </div>
   </section>
 
+  <!-- FUSE BEADS -->
+  <section class="view" id="v-fuse">
+    <div class="ed">
+      <div class="panel">
+        <div class="sec">Start from</div>
+        <div class="row">
+          <button class="btn sm" id="fzFromEd">✏️ Editor pattern</button>
+          <button class="btn sm" id="fzFromPic">🖼 A picture</button>
+        </div>
+        <label>…or a library design<select id="fzLib"><option value="">Choose a design</option></select></label>
+        <input type="file" id="fzFile" accept="image/*" hidden>
+        <div id="fzPicOpts" class="panel" style="padding:0;border:0" hidden>
+          <div class="note">Your own drawing or picture. It's resized to the width you pick and matched to fuse bead colors.</div>
+          <div class="row">
+            <label>Width (beads)<input type="number" id="fzPicW" value="29" min="4" max="120"></label>
+            <label>Max colors<input type="number" id="fzPicMax" value="10" min="2" max="36"></label>
+          </div>
+          <label class="chk"><input type="checkbox" id="fzPicBg" checked> Leave the background empty</label>
+        </div>
+        <div class="istat" id="fzSrc"></div>
+        <div class="sec">Board &amp; beads</div>
+        <div class="row">
+          <label>Bead size<select id="fzSize"><option value="5">Standard (≈5 mm)</option><option value="2.6">Mini (≈2.6 mm)</option></select></label>
+          <label>Pegboard<select id="fzBoard"><option value="29x29">Large square 29×29</option><option value="14x14">Small square 14×14</option><option value="0x0">One big board</option><option value="custom">Custom…</option></select></label>
+        </div>
+        <div class="row" id="fzCustom" hidden>
+          <label>Board columns<input type="number" id="fzBW" value="29" min="4" max="120"></label>
+          <label>Board rows<input type="number" id="fzBH" value="29" min="4" max="120"></label>
+        </div>
+        <div class="sec">Conversion</div>
+        <div class="row">
+          <label>Scale<select id="fzScale"><option value="1">1× (one fuse bead per bead)</option><option value="2">2×</option><option value="3">3×</option></select></label>
+          <label id="fzStagLbl">Offset rows<select id="fzStag"><option value="straight">Straighten</option><option value="stagger">Keep the stagger (2× wide)</option></select></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="fzOut"> Outline around the design</label>
+        <div class="pal mini" id="fzOutPal"></div>
+        <label class="chk"><input type="checkbox" id="fzBgOn"> Fill the background</label>
+        <div class="pal mini" id="fzBgPal"></div>
+        <label class="chk"><input type="checkbox" id="fzNums" checked> Row &amp; column numbers</label>
+        <div class="sec">Touch up</div>
+        <div class="note">Tap beads on the chart to recolor them. Pick "Empty" to remove one. Changing a setting above starts the chart over.</div>
+        <div class="pal mini" id="fzPaint"></div>
+        <div class="cur">Painting with: <i id="fzPaintSw"></i><span id="fzPaintName"></span></div>
+        <div class="sec">Boards</div>
+        <div class="big" id="fzInfo" style="font-size:15px"></div>
+        <div class="row">
+          <button class="btn sm" id="fzPrev">◀</button>
+          <span class="note" id="fzBoardLbl" style="flex:1;text-align:center"></span>
+          <button class="btn sm" id="fzNext">▶</button>
+        </div>
+        <div class="sec" id="fzListTitle">Shopping list</div>
+        <div class="counts" id="fzCounts"></div>
+        <div class="row">
+          <button class="btn pri" id="fzPng">⬇ Chart PNG</button>
+          <button class="btn" id="fzPrint">🖨 Print</button>
+        </div>
+        <a class="note" href="#" id="fzTips">🔥 How to iron fuse beads →</a>
+      </div>
+      <div class="stage"><canvas id="fzCv"></canvas></div>
+    </div>
+  </section>
+
   <!-- GUIDE -->
   <section class="view" id="v-guide">
     <article class="guide panel">
@@ -275,6 +340,22 @@ a.btn{color:var(--tx)}
         <li>Many cuff charts in the library are 24–28 beads wide. Change the width in the editor to fit you, and keep the width even for peyote.</li>
         <li>Making kandi to trade? Leave a little slack; other people's hands differ from yours.</li>
       </ul>
+
+      <h3 id="g-fuse">Fuse beads</h3>
+      <p>Fuse beads are small tube beads you lay on a pegboard and melt together with an iron to make a flat piece: keychains, magnets, coasters, or charms you can tie onto kandi. The <b>Fuse</b> tab turns any pattern in this app, or a picture of your own, into a pegboard chart.</p>
+      <ul>
+        <li><b>Converting kandi patterns.</b> Square-grid charts move straight over, one fuse bead per pony bead. Peyote charts have offset rows, which a pegboard can't hold, so either straighten the rows or keep the stagger by using two fuse beads per pony bead.</li>
+        <li><b>Big designs</b> are split across several pegboards. Pegboards can sit edge to edge, so you can fuse the whole piece at once.</li>
+        <li><b>Outlines</b> make a design pop and hold it together where thin parts touch.</li>
+      </ul>
+      <ol>
+        <li>Place the beads following the chart, one board at a time. Tweezers help with mini beads.</li>
+        <li>Lay ironing paper over the beads. Never let the iron touch the beads directly.</li>
+        <li>With the iron on medium and no steam, move it in slow circles for about 10–20 seconds, until the bead holes start to close. Lift the paper corner to check, and go easy at first: you can add heat but you can't undo melting.</li>
+        <li>While the piece is warm, put a heavy book on it, still covered by the paper, so it cools flat.</li>
+        <li>Once cool, peel it off the board. Iron the back the same way if you want it sturdier.</li>
+      </ol>
+      <p>An iron gets very hot: kids should fuse with an adult. Iron in a ventilated room and keep the iron moving so the beads and the pegboard don't scorch.</p>
     </article>
   </section>
 
@@ -320,6 +401,7 @@ a.btn{color:var(--tx)}
           <button class="btn sm" id="expPng">⬇ PNG</button>
           <button class="btn sm" id="expJson">⬇ .json</button>
           <button class="btn sm" id="dup">⧉ Duplicate</button>
+          <button class="btn sm" id="toFuse">🔥 Fuse beads</button>
         </div>
       </div>
       <div class="stage"><canvas id="cv"></canvas></div>
@@ -1637,7 +1719,7 @@ function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);
 
 // ---------- views ----------
 function show(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));document.querySelectorAll('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));
-  if(v==='lib')renderLib();if(v==='make')renderMake();if(v==='ed')renderEd();if(v==='work')renderWork();if(v==='links')renderLinks();}
+  if(v==='lib')renderLib();if(v==='make')renderMake();if(v==='ed')renderEd();if(v==='work')renderWork();if(v==='links')renderLinks();if(v==='fuse')renderFuse();}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
 
 // ---------- library ----------
@@ -1648,7 +1730,7 @@ function card(p,own){
   const tot=p.cells.filter(v=>v>=0).length;
   d.append(th);d.insertAdjacentHTML('beforeend',`<b>${esc(p.name)}</b><span>${p.cat?esc(p.cat)+' · ':''}${p.w}×${p.h}${p.stitch==='peyote'?' · peyote':''} · ${tot} beads</span>`);
   const a=document.createElement('div');a.className='acts';
-  const b1=mk('Edit',()=>openEd(p,own)),b2=mk('Bead it',()=>{openEd(p,own);show('work')});a.append(b1,b2);
+  const b1=mk('Edit',()=>openEd(p,own)),b2=mk('Bead it',()=>{openEd(p,own);show('work')});a.append(b1,b2,mk('Fuse',()=>fuseFrom(p)));
   if(own)a.append(mk('Delete',()=>{if(confirm('Delete "'+p.name+'"?')){mine=mine.filter(q=>q.id!==p.id);store(KEY,mine);renderLib()}}));
   d.append(a);d.onclick=e=>{if(e.target.tagName!=='BUTTON')openEd(p,own)};
   return d;
@@ -1841,11 +1923,155 @@ function renderMake(){
 $('mkEdit').onclick=()=>openEd(Object.assign(clone(mkCur),{id:'make'}),false);
 $('mkBead').onclick=()=>{openEd(Object.assign(clone(mkCur),{id:'make'}),false);show('work')};
 
+// ---------- fuse beads ----------
+// A generic fuse-bead color set; pony-bead colors map to their nearest one.
+const FUSE=[['White','#f7f7f2'],['Cream','#f3e6c4'],['Pastel Yellow','#fff1a1'],['Yellow','#fbd82a'],['Orange','#f7871e'],['Peach','#f9b98f'],
+  ['Red','#d8232a'],['Cherry','#a3132a'],['Pink','#f78fb8'],['Bubblegum','#ff5aa5'],['Magenta','#d6338a'],['Light Purple','#c7a3e6'],
+  ['Purple','#7b3fb0'],['Plum','#5a2a6e'],['Light Blue','#8fd0f2'],['Sky Blue','#43a8e6'],['Blue','#1f5fbf'],['Navy','#1c2a5e'],
+  ['Turquoise','#20b6b0'],['Mint','#a6e3c6'],['Lime','#a2e63b'],['Light Green','#8fd14f'],['Green','#2b9348'],['Dark Green','#1d5c34'],['Tan','#d8b48a'],
+  ['Light Brown','#a8743f'],['Brown','#6b4226'],['Light Grey','#c9cacf'],['Grey','#9c9ea3'],['Dark Grey','#55585e'],['Black','#1b1b1d'],
+  ['Glow','#e2f7c4'],['Neon Yellow','#e8ff3a'],['Neon Green','#4cff4c'],['Neon Pink','#ff3fa4'],['Neon Orange','#ff6a2b']];
+const FRGB=FUSE.map(f=>[1,3,5].map(i=>parseInt(f[1].substr(i,2),16)));
+const fIdx=n=>FUSE.findIndex(f=>f[0]===n);
+function nearFuse(r,g,b,pool){let bi=-1,bd=1e9;(pool||FUSE.map((_,i)=>i)).forEach(i=>{const c=FRGB[i],dr=r-c[0],dg=g-c[1],db=b-c[2],d=2*dr*dr+4*dg*dg+3*db*db;if(d<bd){bd=d;bi=i}});return bi}
+const P2F=RGB.map(c=>nearFuse(...c));
+let fz={src:null,pic:null,picName:'',grid:null,board:-1,paint:fIdx('Black'),outC:fIdx('Black'),bgC:fIdx('White')};
+
+// picture -> fuse colors, resized to the chosen width
+function picToFuse(){
+  const im=fz.pic,w=Math.max(4,Math.min(120,+$('fzPicW').value||29)),h=Math.max(1,Math.min(120,Math.round(w*im.height/im.width)));
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d',{willReadFrequently:true});
+  g.imageSmoothingQuality='high';g.drawImage(im,0,0,w,h);const d=g.getImageData(0,0,w,h).data,bg=cornerBg(d,w,h),dropBg=$('fzPicBg').checked;
+  let cells=[];for(let i=0;i<w*h;i++){const r=d[i*4],gg=d[i*4+1],b=d[i*4+2],a=d[i*4+3];
+    cells.push(a<128||(dropBg&&bg[3]>=128&&Math.abs(r-bg[0])+Math.abs(gg-bg[1])+Math.abs(b-bg[2])<45)?-1:nearFuse(r,gg,b))}
+  // keep the most used colors, move the rest to the closest kept one
+  const cnt={};cells.forEach(v=>{if(v>=0)cnt[v]=(cnt[v]||0)+1});
+  const keep=Object.keys(cnt).map(Number).sort((a,b)=>cnt[b]-cnt[a]).slice(0,Math.max(2,+$('fzPicMax').value||10));
+  cells=cells.map(v=>v<0||keep.includes(v)?v:nearFuse(...FRGB[v],keep));
+  return{name:fz.picName,w,h,cells};
+}
+// pony pattern -> fuse grid; peyote rows are straightened, or kept staggered on a double-width grid
+function ponyToFuse(p){
+  if(p.stitch==='peyote'&&$('fzStag').value==='stagger'){
+    const w=2*p.w+1,h=2*p.h,cells=[];
+    for(let Y=0;Y<h;Y++){const y=Y>>1,o=odd(p,y)?1:0;for(let X=0;X<w;X++){const x=Math.floor((X-o)/2);const v=X-o<0||x>=p.w?-1:p.cells[y*p.w+x];cells.push(v<0?-1:P2F[v])}}
+    return{name:p.name,w,h,cells};
+  }
+  return{name:p.name,w:p.w,h:p.h,cells:p.cells.map(v=>v<0?-1:P2F[v])};
+}
+function fuseBuild(){
+  let g=fz.pic?picToFuse():ponyToFuse(fz.src);
+  const s=+$('fzScale').value;
+  if(s>1){const c=[];for(let y=0;y<g.h*s;y++)for(let x=0;x<g.w*s;x++)c.push(g.cells[Math.floor(y/s)*g.w+Math.floor(x/s)]);g={name:g.name,w:g.w*s,h:g.h*s,cells:c}}
+  if($('fzOut').checked){
+    // grow the board by one bead on each side, then ring every filled bead with the outline color
+    const w=g.w+2,h=g.h+2,src=Array(w*h).fill(-1);
+    for(let y=0;y<g.h;y++)for(let x=0;x<g.w;x++)src[(y+1)*w+x+1]=g.cells[y*g.w+x];
+    const out=src.slice();
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){if(src[y*w+x]>=0)continue;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<w&&Y<h&&src[Y*w+X]>=0)out[y*w+x]=fz.outC}}
+    g={name:g.name,w,h,cells:out};
+  }
+  if($('fzBgOn').checked)g.cells=g.cells.map(v=>v<0?fz.bgC:v);
+  fz.grid=g;
+}
+function boards(){
+  const g=fz.grid,v=$('fzBoard').value;let bw,bh;
+  if(v==='custom'){bw=Math.max(4,+$('fzBW').value||29);bh=Math.max(4,+$('fzBH').value||29)}else[bw,bh]=v.split('x').map(Number);
+  if(!bw){bw=g.w;bh=g.h}
+  const ax=Math.ceil(g.w/bw),ay=Math.ceil(g.h/bh);return{bw,bh,ax,ay,n:ax*ay};
+}
+function viewRect(){const g=fz.grid,b=boards();if(fz.board<0||b.n===1)return{x:0,y:0,w:g.w,h:g.h};
+  const x=(fz.board%b.ax)*b.bw,y=Math.floor(fz.board/b.ax)*b.bh;return{x,y,w:Math.min(b.bw,g.w-x),h:Math.min(b.bh,g.h-y)}}
+// the chart: round fuse beads on a pegboard, 5/10 guide lines, board seams and optional numbers
+function fuseDraw(cv,bs,nums){
+  const g=fz.grid,r=viewRect(),b=boards(),m=nums?Math.max(18,Math.round(bs*1.3)):0,dpr=window.devicePixelRatio||1;
+  const W=m+r.w*bs+2,H=m+r.h*bs+2;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.style.width=W+'px';cv.style.height=H+'px';
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);c.fillStyle='#e9e4f2';c.fillRect(0,0,W,H);
+  c.fillStyle='#d6cfe4';c.fillRect(m,m,r.w*bs,r.h*bs);
+  for(let y=0;y<r.h;y++)for(let x=0;x<r.w;x++){
+    const v=g.cells[(r.y+y)*g.w+r.x+x],cx=m+x*bs+bs/2,cy=m+y*bs+bs/2;
+    if(v<0){c.fillStyle='#b9b0cc';c.beginPath();c.arc(cx,cy,Math.max(1,bs*.12),0,7);c.fill();continue}
+    c.fillStyle=FUSE[v][1];c.beginPath();c.arc(cx,cy,bs*.46,0,7);c.fill();
+    c.strokeStyle='rgba(0,0,0,.18)';c.lineWidth=1;c.stroke();
+    if(bs>=8){c.fillStyle='rgba(0,0,0,.28)';c.beginPath();c.arc(cx,cy,bs*.17,0,7);c.fill();
+      c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.arc(cx-bs*.18,cy-bs*.18,bs*.08,0,7);c.fill()}
+  }
+  // guide lines every 5 and 10 beads, counted from the whole chart so boards line up
+  for(let x=0;x<=r.w;x++){const X=r.x+x;if(X%5&&x!==0&&x!==r.w)continue;const seam=X%b.bw===0&&b.n>1&&fz.board<0;
+    c.strokeStyle=seam?'#ff1493':X%10?'rgba(60,40,90,.25)':'rgba(60,40,90,.55)';c.lineWidth=seam?3:1;c.beginPath();c.moveTo(m+x*bs,m);c.lineTo(m+x*bs,m+r.h*bs);c.stroke()}
+  for(let y=0;y<=r.h;y++){const Y=r.y+y;if(Y%5&&y!==0&&y!==r.h)continue;const seam=Y%b.bh===0&&b.n>1&&fz.board<0;
+    c.strokeStyle=seam?'#ff1493':Y%10?'rgba(60,40,90,.25)':'rgba(60,40,90,.55)';c.lineWidth=seam?3:1;c.beginPath();c.moveTo(m,m+y*bs);c.lineTo(m+r.w*bs,m+y*bs);c.stroke()}
+  if(nums){c.fillStyle='#3a2d5c';c.font=`${Math.min(11,Math.max(8,bs*.55))}px Arial`;c.textAlign='center';c.textBaseline='middle';const step=bs>=16?1:5;
+    for(let x=0;x<r.w;x++){const X=r.x+x+1;if(X%step===0||step===1)c.fillText(X,m+x*bs+bs/2,m/2)}
+    for(let y=0;y<r.h;y++){const Y=r.y+y+1;if(Y%step===0||step===1)c.fillText(Y,m/2,m+y*bs+bs/2)}}
+  cv._m=m;cv._bs=bs;cv._r=r;
+}
+function fuseCounts(r){const g=fz.grid,n={};for(let y=r.y;y<r.y+r.h;y++)for(let x=r.x;x<r.x+r.w;x++){const v=g.cells[y*g.w+x];if(v>=0)n[v]=(n[v]||0)+1}
+  return Object.entries(n).map(([k,v])=>[+k,v]).sort((a,b)=>b[1]-a[1])}
+function fpicker(el,get,set,withEmpty){
+  el.innerHTML='';const opts=(withEmpty?[-1]:[]).concat(FUSE.map((_,i)=>i));
+  opts.forEach(i=>{const s=document.createElement('div');s.className='sw';if(i<0){s.style.background='repeating-linear-gradient(45deg,#fff 0 3px,#bbb 3px 6px)';s.title='Empty'}
+    else{s.style.background=FUSE[i][1];s.title=FUSE[i][0]}s.onclick=()=>{set(i);renderFuse()};el.append(s)});
+  el._sync=()=>[...el.children].forEach((s,j)=>s.classList.toggle('on',opts[j]===get()));
+}
+fpicker($('fzOutPal'),()=>fz.outC,v=>{fz.outC=v;$('fzOut').checked=true;fz.grid=null});
+fpicker($('fzBgPal'),()=>fz.bgC,v=>{fz.bgC=v;$('fzBgOn').checked=true;fz.grid=null});
+fpicker($('fzPaint'),()=>fz.paint,v=>fz.paint=v,true);
+CATS.forEach(cat=>{const og=document.createElement('optgroup');og.label=cat;STARTERS.forEach((p,i)=>{if(p.cat===cat)og.append(new Option(p.name,i))});$('fzLib').append(og)});
+function fuseFrom(p){fz.src=clone(p);fz.pic=null;fz.grid=null;fz.board=-1;show('fuse')}
+$('fzLib').onchange=e=>{if(e.target.value!=='')fuseFrom(STARTERS[+e.target.value])};
+$('fzFromEd').onclick=()=>{if(!cur){toast('Open a pattern in the editor first');return}fuseFrom(cur)};
+$('toFuse').onclick=()=>fuseFrom(cur);
+$('fzFromPic').onclick=()=>$('fzFile').click();
+$('fzFile').onchange=e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const im=new Image();
+  im.onload=()=>{fz.pic=im;fz.picName=f.name.replace(/\.\w+$/,'');fz.src=null;fz.grid=null;fz.board=-1;renderFuse()};im.onerror=()=>toast('Could not read that image');im.src=URL.createObjectURL(f)};
+// settings that change the beads start the chart over; board and number settings only change the view
+['fzPicW','fzPicMax','fzPicBg','fzScale','fzStag','fzOut','fzBgOn'].forEach(id=>$(id).addEventListener('change',()=>{fz.grid=null;renderFuse()}));
+['fzSize','fzBoard','fzBW','fzBH','fzNums'].forEach(id=>$(id).addEventListener('change',()=>{fz.board=-1;renderFuse()}));
+$('fzPrev').onclick=()=>{const n=boards().n;fz.board=fz.board<0?n-1:fz.board-1;renderFuse()};
+$('fzNext').onclick=()=>{const n=boards().n;fz.board=fz.board>=n-1?-1:fz.board+1;renderFuse()};
+$('fzCv').addEventListener('click',e=>{
+  const cv=$('fzCv'),rc=cv.getBoundingClientRect(),x=Math.floor((e.clientX-rc.left-cv._m)/cv._bs),y=Math.floor((e.clientY-rc.top-cv._m)/cv._bs);
+  if(x<0||y<0||x>=cv._r.w||y>=cv._r.h)return;fz.grid.cells[(cv._r.y+y)*fz.grid.w+cv._r.x+x]=fz.paint;renderFuse();
+});
+$('fzTips').onclick=e=>{e.preventDefault();show('guide');$('g-fuse').scrollIntoView({behavior:'smooth'})};
+function renderFuse(){
+  if(!fz.src&&!fz.pic)fz.src=clone(cur||STARTERS[0]);
+  if(!fz.grid)fuseBuild();
+  const g=fz.grid,b=boards();if(fz.board>=b.n)fz.board=-1;
+  $('fzPicOpts').hidden=!fz.pic;$('fzStagLbl').hidden=!(fz.src&&fz.src.stitch==='peyote');$('fzCustom').hidden=$('fzBoard').value!=='custom';
+  $('fzSrc').textContent='Converting: '+(g.name||'Untitled');$('fzSrc').className='istat ok';
+  ['fzOutPal','fzBgPal','fzPaint'].forEach(id=>$(id)._sync());
+  $('fzPaintSw').className=fz.paint<0?'empty':'';$('fzPaintSw').style.background=fz.paint<0?'':FUSE[fz.paint][1];$('fzPaintName').textContent=fz.paint<0?'Empty':FUSE[fz.paint][0];
+  const mm=+$('fzSize').value,cm=v=>(v*mm/10).toFixed(1),inch=v=>(v*mm/25.4).toFixed(1);
+  $('fzInfo').textContent=`${g.w} × ${g.h} beads · ≈ ${cm(g.w)} × ${cm(g.h)} cm (${inch(g.w)} × ${inch(g.h)} in)`+(b.n>1?` · ${b.n} boards (${b.ax} across × ${b.ay} down)`:' · fits one board');
+  $('fzBoardLbl').textContent=fz.board<0?(b.n>1?'Whole design':'One board'):`Board ${fz.board+1} of ${b.n}`;
+  $('fzPrev').disabled=$('fzNext').disabled=b.n<2;
+  const r=viewRect(),cs=fuseCounts(r),tot=cs.reduce((s,x)=>s+x[1],0);
+  $('fzListTitle').textContent=fz.board<0?'Shopping list':`Beads for board ${fz.board+1}`;
+  $('fzCounts').innerHTML=cs.map(([i,n])=>`<div><i style="background:${FUSE[i][1]}"></i>${FUSE[i][0]}<em>${n}</em></div>`).join('')+`<div style="border-top:1px solid var(--ln);padding-top:4px"><b>Total</b><em>${tot}</em></div>`;
+  const cv=$('fzCv'),avail=Math.max(200,cv.parentElement.clientWidth-24),nums=$('fzNums').checked;
+  fuseDraw(cv,Math.max(5,Math.min(30,Math.floor((avail-(nums?22:0))/r.w))),nums);
+}
+// full chart at a printable size
+function fuseImage(){const keep=fz.board;fz.board=-1;const cv=document.createElement('canvas');fuseDraw(cv,Math.max(10,Math.min(22,Math.floor(2000/fz.grid.w))),true);fz.board=keep;return cv.toDataURL('image/png')}
+$('fzPng').onclick=()=>dl(fuseImage(),fname({name:(fz.grid.name||'kandi')+' fuse'})+'.png');
+$('fzPrint').onclick=()=>{
+  const w=window.open('','_blank');if(!w){toast('Allow pop-ups to print, or download the PNG');return}
+  const cs=fuseCounts({x:0,y:0,w:fz.grid.w,h:fz.grid.h});
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>${esc(fz.grid.name||'Fuse chart')}</title><style>body{font:13px Arial;margin:16px}img{max-width:100%}td{padding:2px 8px}i{display:inline-block;width:12px;height:12px;border:1px solid #888;border-radius:50%;vertical-align:middle}</style>
+    <h2>${esc(fz.grid.name||'Fuse chart')}</h2><p>${esc($('fzInfo').textContent)}</p><img src="${fuseImage()}"><h3>Shopping list</h3>
+    <table>${cs.map(([i,n])=>`<tr><td><i style="background:${FUSE[i][1]}"></i> ${FUSE[i][0]}</td><td>${n}</td></tr>`).join('')}</table>
+    <script>document.images[0].onload=()=>print()<\/script>`);
+  w.document.close();
+};
+
 // ---------- guide ----------
 document.querySelectorAll('.guide h3').forEach(h=>{const t=document.createElement('span');t.className='tag';t.textContent=h.textContent;
   t.onclick=()=>h.scrollIntoView({behavior:'smooth'});$('gToc').append(t)});
 
-let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if($('v-ed').classList.contains('on'))renderEd();if($('v-work').classList.contains('on'))renderWork();if($('v-make').classList.contains('on'))renderMake()},150)});
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{if($('v-ed').classList.contains('on'))renderEd();if($('v-work').classList.contains('on'))renderWork();if($('v-make').classList.contains('on'))renderMake();if($('v-fuse').classList.contains('on'))renderFuse()},150)});
 
 // ---------- image import ----------
 // The image is drawn once onto a working canvas (max 1200px); all grid maths happens in that space.
