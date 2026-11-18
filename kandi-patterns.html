@@ -510,6 +510,7 @@ const GENS={
   blobs:{name:'Blobs & camo',f:(x,y,g)=>g.c[Math.min(g.n-1,Math.floor(vnoise(x/(g.s*1.6),y/(g.s*1.6),g.seed)*g.n*1.15))]},
   hearts:{name:'Tiny hearts',f:(x,y,g)=>{const i=tile(TILE_HEART,x,y,g.s);return i<0?g.c[0]:g.c[1+i%Math.max(1,g.n-1)]}},
   stars:{name:'Tiny stars',f:(x,y,g)=>{const i=tile(TILE_STAR,x,y,g.s);return i<0?g.c[0]:g.c[1+i%Math.max(1,g.n-1)]}},
+  glitch:{name:'Glitch checker',f:(x,y,g)=>{const o=hash(0,y,g.seed)<.35?1+Math.floor(hash(1,y,g.seed)*4):0;return g.c[(Math.floor((x+o)/g.s)+Math.floor(y/g.s))%g.n]}},
   confetti:{name:'Confetti',f:(x,y,g)=>hash(x,y,g.seed)<.22?g.c[1+Math.floor(hash(y,x,g.seed+1)*Math.max(1,g.n-1))]:g.c[0]}
 };
 function makeGen(type,o){
@@ -1594,7 +1595,201 @@ PLUR Colors|sq|single,plur
 HHHCCCYYYEEEHHHCCCYYYEEEHHHCCC
 
 Black & Neon|sq|single,neon,black
-KEKEKFKFKHKHKCKCKYKYKEKEKFKFKH`;
+KEKEKFKFKHKHKCKCKYKYKEKEKFKFKH
+
+#Teal & Pink
+Music Notes|sq|teal,music,notes
+....TTTTTT.
+....T....T.
+....TTTTTT.
+....T....T.
+....T....T.
+....T....T.
+..TTT..TTT.
+.TTTT.TTTT.
+.TTT..TTT..
+
+Teal Heart|sq|teal,heart,pink
+.KK...KK.
+KTTK.KTTK
+KTNTKTTTK
+KTTTTTTTK
+.KTTTTTK.
+..KTTTK..
+...KTK...
+....K....
+
+Teal Beats|sq|teal,headphones,music,pink
+...TTTTT...
+..T.....T..
+.T.......T.
+.T.......T.
+NNN.....NNN
+NKN.....NKN
+NKN.....NKN
+NNN.....NNN
+
+Sound Wave|sq|teal,music,cuff,black
+KKKKKKKKKKKKKKKKKKKKKK
+KKKKKKKNKKKKKKKKKNKKKK
+KKKNKKKNKKKNKKKKKNKKKK
+KKKTKKTTKKKTKKNKKTKNKK
+KTKTKKTTKTKTKKTKKTKTKK
+KTTTTKTTTTTTTKTTTTTTTK
+KTTTTTTTTTTTTTTTTTTTTK
+KKKKKKKKKKKKKKKKKKKKKK
+
+#Black & Red
+Bleeding Heart|sq|emo,heart,red
+.RR...RR.
+RRRR.RRRR
+RWRRRRRRR
+RRRRRRRRR
+.RRRRRRR.
+..RRRRR..
+..RRRRR..
+..R.RRR..
+....R.R..
+....R....
+
+Black Rose|sq|emo,rose,black
+...KKKKK...
+..KKAKKKK..
+.KKAKKAKKK.
+.KAKKAAKAK.
+.KKAAKKAKK.
+..KKKKKKK..
+...KKKKK...
+.....G.....
+..GG.G.....
+...GGG.....
+.....G.....
+
+Barbed Wire|sq|emo,cuff,red,punk
+RRRRRRRRRRRRRRRRRRRRR
+RRKRKRRRRKRKRRRRKRKRR
+RRRKRRRRRRKRRRRRRKRRR
+KKKKKKKKKKKKKKKKKKKKK
+RRRKRRRRRRKRRRRRRKRRR
+RRKRKRRRRKRKRRRRKRKRR
+RRRRRRRRRRRRRRRRRRRRR
+
+Red Drip|sq|emo,cuff,drip,black
+RRRRRRRRRRRRRRRRRRRR
+RRRRRRRRRRRRRRRRRRRR
+KRRKRRRKKRRRKRKRRRKR
+KRKKKRKKKRKKKKKRKKKR
+KRKKKKKKKRKKKKKKKKKK
+KKKKKKKKKKKKKKKKKKKK
+KKKKKKKKKKKKKKKKKKKK
+
+Emo Star|sq|emo,star,red
+.....K.....
+....KRK....
+....KRK....
+KKKKKRKKKKK
+.KRRRRRRRK.
+..KRRRRRK..
+...KRRRK...
+..KRRKRRK..
+..KRK.KRK..
+.KRK...KRK.
+.KK.....KK.
+
+#Sweet & Pastel
+Pink Bow|sq|bow,pink,cute
+.NN.....NN.
+NHNN...NNHN
+NHHNN.NNHHN
+NHHHNHNHHHN
+NHHNN.NNHHN
+NHNN...NNHN
+.NN.....NN.
+
+Mochi Cat|sq|cat,kitty,cute,tan
+S.........S
+SS.......SS
+SNS.....SNS
+SSSSSSSSSSS
+SSKSSSSSKSS
+SKSKSSSKSKS
+SNSSSSSSSNS
+SNSSKSKSSNS
+SSSSSKSSSSS
+.SSSSSSSSS.
+..SSSSSSS..
+
+Sparkle|sq|sparkle,star,pastel
+....V....
+....V....
+...VWV...
+VVVWWWVVV
+...VWV...
+....V....
+....V....
+
+#Creepy Cute
+Glitch Blob|sq|creepy,monster,purple,glitch
+...PPPPPP...
+..PPPPPPPPP.
+.PPWWWPPPPP.
+.PWWKWPPLLP.
+.PPWWWPPLKP.
+PPPPPPPPPPPP
+PPKPKPKPKPPP
+PPPKPKPKPPPP
+.PPPPPPPPPP.
+.P.PP.PP.PP.
+.P..P..P..P.
+....P.......
+
+Drippy Smile|sq|creepy,smile,slime,black
+KKKKKKKKKKK
+KKEEEEEEEKK
+KEEKEEEKEEK
+KEEKEEEKEEK
+KEEEEEEEEEK
+KEKEEEEEKEK
+KEEKKKKKEEK
+KEEEEEEEEEK
+KKEEKEEEKKK
+KKKEKEKEKKK
+KKKEKKKEKKK
+KKKKKKKEKKK
+
+Stitched Heart|sq|creepy,heart,pink,purple
+.HH...PP.
+HHHH.PPPP
+HHHKKKPPP
+HHHHKPPPP
+.HHKKKPP.
+..HHKPP..
+...KKK...
+....K....
+
+Static Ghost|sq|creepy,ghost,glitch
+...WAWWW...
+..WWWAWCW..
+.WAWWWWWAW.
+.WWKWWWKWW.
+.CWKWAWKWW.
+.WWWWWWWCW.
+.WAWWKWWWW.
+.WWWKKKWAW.
+.CWWWKWWWW.
+.WWAWWWCWW.
+.W.WW.WA.W.
+
+Eye See You|sq|creepy,eyes
+.WWW...WWW.
+WWBWW.WWPWW
+WBKBW.WPKPW
+WWBWW.WWPWW
+.WWW.W.WWW.
+....WGW....
+...WGKGW...
+....WGW....
+.....W.....`;
 function parseLib(src){
   const out=[];let cat='Other',cur=null;
   src.split('\n').forEach(line=>{
@@ -1663,6 +1858,36 @@ const STARTERS=[
   wordD('smile,word,yellow',{text:'SMILE',fg:CH.K,bg:CH.Y,border:CH.O,pad:1,minW:26}),
   wordD('bass,word,music',{text:'BASS',fg:CH.C,bg:CH.K,border:CH.B,pad:1,minW:26}),
   wordD('dance,word,rainbow',{text:'DANCE',fg:CH.W,bg:CH.K,rainbow:true,pad:1,minW:26}),
+
+  genD('Rainbow & Gradients','rainbow,ombre,peyote','fade',{name:'Rainbow Ombré',w:24,h:14,colors:['R','O','Y','L','B','P'],stitch:'peyote'}),
+  genD('Rainbow & Gradients','rainbow,neon,chevron','chevron',{name:'Neon Rainbow Chevron',w:24,h:12,colors:['H','F','Y','E','C','P'],size:1}),
+  genD('Rainbow & Gradients','rainbow,checker','checker',{name:'Rainbow Checker',w:24,h:12,colors:['R','O','Y','L','B','P'],size:2}),
+  genD('Rainbow & Gradients','rainbow,diamonds','diamonds',{name:'Rainbow Diamonds',w:24,h:12,colors:['R','O','Y','L','B','P'],size:1}),
+  genD('Rainbow & Gradients','rainbow,bullseye','circles',{name:'Rainbow Bullseye',w:17,h:17,colors:['R','O','Y','L','B','P'],size:1.4}),
+  genD('Rainbow & Gradients','rainbow,hearts,black','hearts',{name:'Rainbow Hearts',w:24,h:9,colors:['K','R','O','Y','L','B','P'],size:1}),
+  genD('Rainbow & Gradients','rainbow,plaid','plaid',{name:'Rainbow Plaid',w:24,h:12,colors:['R','Y','B'],size:2}),
+  genD('Rainbow & Gradients','rainbow,sprinkles,white','confetti',{name:'Rainbow Sprinkles',w:24,h:8,colors:['W','R','O','Y','L','B','P'],seed:12}),
+  genD('Rainbow & Gradients','pastel,rainbow,stripes','stripes',{name:'Pastel Rainbow',w:24,h:8,colors:['N','V','C','Z'],size:2}),
+  genD('Rainbow & Gradients','cotton candy,fade,pastel','fade',{name:'Cotton Candy',w:24,h:10,colors:['N','V','C'],stitch:'peyote'}),
+  genD('Rainbow & Gradients','mermaid,fade,teal','fade',{name:'Mermaid Fade',w:24,h:10,colors:['T','C','V','P'],stitch:'peyote'}),
+  genD('Rainbow & Gradients','lava,fade,red','fade',{name:'Lava Fade',w:24,h:10,colors:['Y','F','R','K']}),
+  genD('Rainbow & Gradients','aurora,fade,night','fade',{name:'Aurora',w:24,h:12,colors:['K','P','B','T','E'],stitch:'peyote'}),
+  genD('Rainbow & Gradients','sunset,waves','waves',{name:'Sunset Waves',w:24,h:12,colors:['Y','O','F','H','P'],size:2}),
+  genD('Teal & Pink','teal,pink,stripes','stripes',{name:'Teal & Pink Stripes',w:24,h:9,colors:['T','N','K'],size:1}),
+  genD('Teal & Pink','teal,checker,black','checker',{name:'Teal Checker',w:24,h:8,colors:['T','K'],size:2}),
+  genD('Teal & Pink','teal,pink,fade','fade',{name:'Teal to Pink Fade',w:24,h:10,colors:['T','C','V','N'],stitch:'peyote'}),
+  genD('Teal & Pink','teal,pink,pinstripes','vstripes',{name:'Teal Pinstripes',w:24,h:8,colors:['T','T','N','K'],size:1}),
+  genD('Black & Red','emo,checker,red','checker',{name:'Emo Checker',w:24,h:8,colors:['K','R'],size:2}),
+  genD('Black & Red','emo,stripes,red','stripes',{name:'Black & Red Stripes',w:24,h:9,colors:['K','K','R'],size:1}),
+  genD('Black & Red','emo,chevron,red','chevron',{name:'Red Chevron',w:24,h:12,colors:['K','R'],size:2}),
+  genD('Black & Red','punk,plaid,red','plaid',{name:'Punk Plaid',w:24,h:12,colors:['R','K','W'],size:2}),
+  genD('Sweet & Pastel','pastel,hearts,cute','hearts',{name:'Pastel Hearts',w:24,h:9,colors:['Z','N','V','C'],size:1}),
+  genD('Sweet & Pastel','pink,dots,cute','dots',{name:'Pink Polka',w:24,h:10,colors:['N','W'],size:1}),
+  genD('Sweet & Pastel','sparkle,stars,pastel','stars',{name:'Sparkle Stars',w:24,h:10,colors:['V','W','Y'],size:2}),
+  genD('Sweet & Pastel','strawberry,milk,stripes','stripes',{name:'Strawberry Milk',w:24,h:8,colors:['N','W'],size:2}),
+  genD('Creepy Cute','glitch,checker,purple','glitch',{name:'Glitch Checker',w:24,h:12,colors:['P','E'],size:2,seed:6}),
+  genD('Creepy Cute','glitch,corrupted,pink','glitch',{name:'Corrupted Pink',w:24,h:12,colors:['K','H'],size:1,seed:21}),
+  genD('Creepy Cute','slime,toxic,blobs','blobs',{name:'Toxic Slime',w:24,h:12,colors:['P','E','K'],size:2,seed:8}),
   wordD('plur,word,trade',{text:'TRADE ME',fg:CH.F,bg:CH.K,pad:1}),
 ];
 STARTERS.forEach((p,i)=>p.id='starter-'+i);
